@@ -8,7 +8,7 @@ interface GoogleMapsWrapperProps {
 // Access provisioned API Key from environment or fallback to provisioned demo key
 export const GOOGLE_MAPS_API_KEY =
   (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string) ||
-  'AIzaSyBXhdFhJTjqUhzrDPTwc5Y68uP9Rdtdmaw';
+  'AIzaSyA6z6LCipBD5sFXBFoZzaoJPdU4R4KjJQ0';
 
 export const GoogleMapsWrapper: React.FC<GoogleMapsWrapperProps> = ({ children }) => {
   return (

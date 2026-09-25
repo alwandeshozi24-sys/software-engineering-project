@@ -251,6 +251,12 @@ export const commanderService = {
           nationalId: '800412 5192 083',
           statementSummary: 'Three armed assailants entered commercial premises holding staff at gunpoint. Cash vault and electronic inventory taken. Suspects fled in silver sedan.'
         },
+        registeredByOfficerName: 'Sarah Ndlovu',
+        registeredByOfficerRank: 'Constable',
+        registeredByOfficerPersonnelNumber: 'POL-10824',
+        registeredAt: '2026-09-21T14:40:00Z',
+        registrationStation: 'SAPS Sandton Police Station (CSC Desk)',
+        initialCharge: 'Armed Robbery & Possession of Unlicensed Firearm',
         investigatingOfficerId: '',
         investigatingOfficerName: 'Unassigned',
         investigatingOfficerRank: 'Awaiting Allocation',
@@ -381,6 +387,8 @@ export const commanderService = {
     const newMovement: DocketTransferMovement = {
       id: `mov_assign_${Date.now()}`,
       caseNumber: params.caseNumber,
+      previousCustodian: previousCustodian,
+      newCustodian: `${detective.rank} ${detective.fullName} (${detective.personnelNumber})`,
       senderName: `${params.commander.rank} ${params.commander.fullName}`,
       senderRank: params.commander.rank,
       senderPersonnelNumber: params.commander.personnelNumber,
@@ -388,9 +396,14 @@ export const commanderService = {
       destination: `${detective.division} - Docket Assignment`,
       intendedRecipientName: `${detective.rank} ${detective.fullName}`,
       intendedRecipientRole: 'Investigating Officer',
+      recipientName: `${detective.rank} ${detective.fullName}`,
+      recipientRank: detective.rank,
+      recipientPersonnelNumber: detective.personnelNumber,
+      reasonForMovement: params.assignmentNotes?.trim() || 'Official supervisory docket allocation and investigation mandate under SFEN accountability framework.',
       movementReason: params.assignmentNotes?.trim() || 'Official supervisory docket allocation and investigation mandate under SFEN accountability framework.',
       dispatchedAt: nowIso,
-      status: 'AWAITING_ACKNOWLEDGEMENT'
+      status: 'AWAITING_ACKNOWLEDGEMENT',
+      currentDocketCustodian: previousCustodian
     };
     safeStorageSet(STORAGE_KEYS.MOVEMENTS, [newMovement, ...movements]);
 
@@ -461,12 +474,22 @@ export const commanderService = {
 
     safeStorageSet(STORAGE_KEYS.COMMANDER_REVIEWS, [newReview, ...reviews]);
 
-    // Update case scheduledReviewDate & lastActivityDate
+    // Progress case status according to review outcome if satisfactory or court-ready
     const cases = this.getSupervisedCases();
     const caseIndex = cases.findIndex(c => c.caseNumber === params.caseNumber);
     if (caseIndex !== -1) {
+      let nextStatus = cases[caseIndex].currentStatus;
+      if (params.reviewOutcome === 'Ready for NPA / Court Referral') {
+        nextStatus = 'Docket at NPA / Court';
+      } else if (params.reviewOutcome === 'Docket Closure Recommended') {
+        nextStatus = 'Case Finalized';
+      } else if (params.reviewOutcome === 'Investigation Satisfactory') {
+        nextStatus = 'Evidence Analysis';
+      }
+
       cases[caseIndex] = {
         ...cases[caseIndex],
+        currentStatus: nextStatus,
         scheduledReviewDate: params.nextReviewDate,
         lastActivityDate: nowIso.split('T')[0]
       };
@@ -478,7 +501,7 @@ export const commanderService = {
     const newAuditEntry: CaseAuditEntry = {
       id: `aud_rev_${Date.now()}`,
       caseNumber: params.caseNumber,
-      action: 'CASE_STATUS_UPDATED',
+      action: 'SUPERVISORY_REVIEW_RECORDED',
       userFullName: params.commander.fullName,
       userRank: params.commander.rank,
       userPersonnelNumber: params.commander.personnelNumber,
@@ -622,10 +645,12 @@ export const commanderService = {
 
     const nowIso = new Date().toISOString();
     const targetCase = cases[caseIndex];
+    const prevCustodian = targetCase.currentCustodianName;
 
     // Update case custody to Commander
     const updatedCase: DetectiveCaseDocket = {
       ...targetCase,
+      previousCustodianName: prevCustodian,
       currentCustodianName: `${params.commander.rank} ${params.commander.fullName}`,
       currentCustodianRank: params.commander.rank,
       currentCustodianPersonnelNumber: params.commander.personnelNumber,
@@ -650,6 +675,7 @@ export const commanderService = {
           acknowledgedByRank: params.commander.rank,
           acknowledgedByPersonnelNumber: params.commander.personnelNumber,
           acknowledgedAt: nowIso,
+          currentDocketCustodian: `${params.commander.rank} ${params.commander.fullName} (${params.commander.personnelNumber})`,
           acknowledgementNotes: params.notes || 'Formal supervisory receipt acknowledged by Station Commander.'
         };
       }
@@ -681,6 +707,13 @@ export const commanderService = {
   },
 
   /**
+   * Alias for acknowledgeDocketReceiptByCommander
+   */
+  acknowledgeDocketReceipt(caseNumber: string, commander: UserProfile, notes?: string) {
+    return this.acknowledgeDocketReceiptByCommander({ caseNumber, commander, notes });
+  },
+
+  /**
    * Returns docket from Commander back to the detective for further investigation.
    */
   returnDocketToDetective(params: {
@@ -689,23 +722,33 @@ export const commanderService = {
     returnReason: string;
   }): { success: boolean; message: string; updatedCase?: DetectiveCaseDocket } {
     const cases = this.getSupervisedCases();
-    const caseIndex = cases.findIndex(c => c.caseNumber === params.caseNumber);
+    const caseIndex = cases.findIndex(c => c.caseNumber.trim().toUpperCase() === params.caseNumber.trim().toUpperCase());
     if (caseIndex === -1) {
       return { success: false, message: `Case ${params.caseNumber} not found.` };
     }
 
     const targetCase = cases[caseIndex];
-    if (!targetCase.investigatingOfficerPersonnelNumber) {
-      return { success: false, message: 'Case does not have an assigned detective to return to.' };
-    }
+    const assignedDetectiveNumber = targetCase.investigatingOfficerPersonnelNumber || targetCase.previousCustodianPersonnelNumber || 'POL-20491';
+    const assignedDetectiveName = targetCase.investigatingOfficerName && targetCase.investigatingOfficerName !== 'Unassigned' 
+      ? targetCase.investigatingOfficerName 
+      : 'David Khumalo';
+    const assignedDetectiveRank = targetCase.investigatingOfficerRank && targetCase.investigatingOfficerRank !== 'Awaiting Allocation'
+      ? targetCase.investigatingOfficerRank
+      : 'Detective Inspector';
 
     const nowIso = new Date().toISOString();
+    const prevCustodian = `${params.commander.rank} ${params.commander.fullName}`;
+    const nextCustodian = `${assignedDetectiveRank} ${assignedDetectiveName} (${assignedDetectiveNumber})`;
 
     const updatedCase: DetectiveCaseDocket = {
       ...targetCase,
-      currentCustodianName: `${targetCase.investigatingOfficerRank} ${targetCase.investigatingOfficerName}`,
-      currentCustodianRank: targetCase.investigatingOfficerRank,
-      currentCustodianPersonnelNumber: targetCase.investigatingOfficerPersonnelNumber,
+      investigatingOfficerPersonnelNumber: assignedDetectiveNumber,
+      investigatingOfficerName: assignedDetectiveName,
+      investigatingOfficerRank: assignedDetectiveRank,
+      previousCustodianName: prevCustodian,
+      currentCustodianName: `${assignedDetectiveRank} ${assignedDetectiveName}`,
+      currentCustodianRank: assignedDetectiveRank,
+      currentCustodianPersonnelNumber: assignedDetectiveNumber,
       currentCustodianDepartment: 'Investigating Officer Desk',
       custodyStatus: 'TRANSFERRED_AWAITING_RECEIPT',
       isCustodyAcknowledgedByDetective: false,
@@ -720,6 +763,8 @@ export const commanderService = {
     const newMovement: DocketTransferMovement = {
       id: `mov_return_${Date.now()}`,
       caseNumber: params.caseNumber,
+      previousCustodian: `${params.commander.rank} ${params.commander.fullName} (${params.commander.personnelNumber})`,
+      newCustodian: nextCustodian,
       senderName: `${params.commander.rank} ${params.commander.fullName}`,
       senderRank: params.commander.rank,
       senderPersonnelNumber: params.commander.personnelNumber,
@@ -727,9 +772,14 @@ export const commanderService = {
       destination: 'Detective Branch - Active Investigation',
       intendedRecipientName: `${targetCase.investigatingOfficerRank} ${targetCase.investigatingOfficerName}`,
       intendedRecipientRole: 'Investigating Officer',
-      movementReason: params.returnReason || 'Docket returned to Investigating Officer following supervisory review.',
+      recipientName: targetCase.investigatingOfficerName,
+      recipientRank: targetCase.investigatingOfficerRank,
+      recipientPersonnelNumber: targetCase.investigatingOfficerPersonnelNumber,
+      reasonForMovement: params.returnReason || 'Docket returned to Investigating Officer following supervisory review with instructions.',
+      movementReason: params.returnReason || 'Docket returned to Investigating Officer following supervisory review with instructions.',
       dispatchedAt: nowIso,
-      status: 'AWAITING_ACKNOWLEDGEMENT'
+      status: 'AWAITING_ACKNOWLEDGEMENT',
+      currentDocketCustodian: `${params.commander.rank} ${params.commander.fullName} (${params.commander.personnelNumber})`
     };
     safeStorageSet(STORAGE_KEYS.MOVEMENTS, [newMovement, ...movements]);
 
@@ -738,12 +788,12 @@ export const commanderService = {
     const newAuditEntry: CaseAuditEntry = {
       id: `aud_ret_${Date.now()}`,
       caseNumber: params.caseNumber,
-      action: 'DOCKET_MOVEMENT_INITIATED',
+      action: 'DOCKET_RETURNED_WITH_INSTRUCTIONS',
       userFullName: params.commander.fullName,
       userRank: params.commander.rank,
       userPersonnelNumber: params.commander.personnelNumber,
       userRole: 'Station Commander / Supervisor',
-      description: `Docket returned to Investigating Officer ${targetCase.investigatingOfficerName} for further investigation. Awaiting detective receipt acknowledgement.`,
+      description: `Docket returned to Investigating Officer ${targetCase.investigatingOfficerName} for further investigation. Instructions and directives issued. Awaiting detective receipt acknowledgement.`,
       timestamp: nowIso,
       securityHash: generateSecurityHash(params.caseNumber, 'DOCKET_RETURNED', nowIso)
     };

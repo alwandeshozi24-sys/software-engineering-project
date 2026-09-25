@@ -129,7 +129,7 @@ export const CommanderPage: React.FC<CommanderPageProps> = ({
   ).length;
 
   const pendingComplaintsCount = complaints.filter(
-    c => c.status === 'UNDER_INVESTIGATION' || c.status === 'ESCALATED_COMMAND'
+    c => c.status === 'Under Investigation' || c.status === 'Pending Review'
   ).length;
 
   const unreadNotifCount = notifications.filter(n => !n.read).length;
@@ -251,12 +251,9 @@ export const CommanderPage: React.FC<CommanderPageProps> = ({
           {activeTab === 'cases' && (
             <CommanderCasesView
               cases={cases}
-              instructions={instructions}
-              commander={user}
               initialFilter={casesFilter}
-              onOpenCaseWorkspace={handleOpenCaseWorkspace}
+              onOpenCase={handleOpenCaseWorkspace}
               onOpenAssignModal={handleOpenAssignModal}
-              onRefreshData={() => refreshAllData(true)}
             />
           )}
 
@@ -265,8 +262,11 @@ export const CommanderPage: React.FC<CommanderPageProps> = ({
             <CommanderDetectivesView
               detectivesWorkload={detectivesWorkload}
               cases={cases}
-              commander={user}
-              onOpenCaseWorkspace={handleOpenCaseWorkspace}
+              onOpenCase={handleOpenCaseWorkspace}
+              onFilterCasesByDetective={(detectivePersonnelNumber) => {
+                setActiveTab('cases');
+                setCasesFilter(detectivePersonnelNumber);
+              }}
             />
           )}
 
@@ -275,7 +275,8 @@ export const CommanderPage: React.FC<CommanderPageProps> = ({
             <CommanderComplaintsView
               complaints={complaints}
               commander={user}
-              onRefreshData={() => refreshAllData(false)}
+              onOpenCaseByNumber={handleOpenCaseByNumber}
+              onRefreshComplaints={() => refreshAllData(false)}
             />
           )}
 
@@ -286,8 +287,13 @@ export const CommanderPage: React.FC<CommanderPageProps> = ({
               complaints={complaints}
               cases={cases}
               commander={user}
-              onOpenCaseWorkspace={handleOpenCaseWorkspace}
-              onRefreshData={() => refreshAllData(false)}
+              onOpenCase={handleOpenCaseWorkspace}
+              onOpenCaseByNumber={handleOpenCaseByNumber}
+              onFilterCasesByDetective={(detectivePersonnelNumber) => {
+                setActiveTab('cases');
+                setCasesFilter(detectivePersonnelNumber);
+              }}
+              onRefreshComplaints={() => refreshAllData(false)}
             />
           )}
 
@@ -295,11 +301,11 @@ export const CommanderPage: React.FC<CommanderPageProps> = ({
           {activeTab === 'notifications' && (
             <CommanderNotificationsView
               notifications={notifications}
-              onMarkAsRead={(id) => {
+              onMarkNotificationAsRead={(id: string) => {
                 commanderService.markNotificationRead(id);
                 refreshAllData(false);
               }}
-              onMarkAllAsRead={() => {
+              onMarkAllNotificationsAsRead={() => {
                 commanderService.markAllNotificationsRead();
                 refreshAllData(false);
               }}

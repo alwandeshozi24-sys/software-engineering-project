@@ -10,6 +10,7 @@ import {
 } from '../../types/detective';
 import { CommanderCaseTab, SupervisoryReviewRecord, AuthorisedStationDetective } from '../../types/commander';
 import { commanderService } from '../../services/commanderService';
+import { CaseLifecycleProvenanceLedger } from '../common/CaseLifecycleProvenanceLedger';
 import { 
   X, 
   Briefcase, 
@@ -558,6 +559,19 @@ export const CommanderCaseWorkspaceModal: React.FC<CommanderCaseWorkspaceModalPr
 
               </div>
 
+              {/* Comprehensive 9-Question Case Provenance & Custody Ledger */}
+              <div className="pt-2">
+                <CaseLifecycleProvenanceLedger
+                  caseDocket={currentCase}
+                  movements={movements}
+                  diaryEntries={diaryEntries}
+                  instructions={instructions}
+                  auditEntries={auditEntries}
+                  reviews={reviews}
+                  initialExpanded={true}
+                />
+              </div>
+
             </div>
           )}
 
@@ -889,7 +903,7 @@ export const CommanderCaseWorkspaceModal: React.FC<CommanderCaseWorkspaceModalPr
                         type="date"
                         value={newInstructionDueDate}
                         onChange={(e) => setNewInstructionDueDate(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-purple-500"
+                        className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -903,7 +917,7 @@ export const CommanderCaseWorkspaceModal: React.FC<CommanderCaseWorkspaceModalPr
                       onChange={(e) => setNewInstructionText(e.target.value)}
                       rows={3}
                       placeholder="e.g. Subpoena cell tower records under Section 205 and verify CCTV footage from adjacent business premises."
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                     />
                   </div>
 
@@ -917,7 +931,7 @@ export const CommanderCaseWorkspaceModal: React.FC<CommanderCaseWorkspaceModalPr
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                     >
                       <Send size={14} />
                       <span>Issue Directive</span>
@@ -949,7 +963,7 @@ export const CommanderCaseWorkspaceModal: React.FC<CommanderCaseWorkspaceModalPr
                               ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                               : inst.status === 'IN_PROGRESS'
                               ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
-                              : 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                              : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                           }`}>
                             {inst.status}
                           </span>

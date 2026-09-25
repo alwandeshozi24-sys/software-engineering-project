@@ -291,21 +291,22 @@ export const SFEN_ROLES_PERMISSIONS: RolePermissionInfo[] = [
     role: 'ADMINISTRATOR',
     title: 'System Administrator',
     category: 'Police Personnel',
-    badgeColor: 'purple',
-    clearanceLevel: 'Level 4 - National Security & Technical Oversight',
+    badgeColor: 'blue',
+    clearanceLevel: 'Level 4 - User Accounts, Roles & Access Administration',
     authorizedPortal: 'System Administration Portal',
-    description: 'Technical custodians responsible for managing users, stations, and system health.',
+    description: 'Technical custodians responsible for managing users, accounts, security access, and system configuration only.',
     accessResponsibilities: [
       'Provision and manage police personnel and complainant accounts',
       'Configure the operational police station parameters (address, phone, commander, coordinates)',
       'Assign and update role-based access control (RBAC) levels',
-      'Monitor administrative audit history and security events',
+      'Monitor administrative audit history and account security events',
       'Perform user account activation, deactivation, and password resets'
     ],
     restrictedBoundaries: [
       'Strictly prohibited from registering or manipulating criminal cases',
       'Cannot access or edit confidential docket investigation notes or evidence',
-      'Cannot assign detectives or intervene in active criminal proceedings'
+      'Cannot assign detectives, supervise investigations, or move dockets',
+      'Remains entirely outside the case registration, investigation, and docket workflow'
     ]
   },
   {

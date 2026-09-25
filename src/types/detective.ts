@@ -80,27 +80,35 @@ export interface InvestigationDiaryRecord {
 export interface DocketTransferMovement {
   id: string;
   caseNumber: string;
+  previousCustodian: string;
+  newCustodian: string;
   senderName: string;
   senderRank: string;
   senderPersonnelNumber: string;
   senderStation: string;
-  destination: string; // e.g. "Forensic Science Laboratory (FSL) - Ballistics"
+  destination: string; // e.g. "Forensic Science Laboratory (FSL)", "Station Commander Review", "Commercial Crime Desk"
   intendedRecipientName?: string;
   intendedRecipientRole?: string;
-  movementReason: string;
-  dispatchedAt: string;
+  recipientName?: string;
+  recipientRank?: string;
+  recipientPersonnelNumber?: string;
+  reasonForMovement: string;
+  movementReason?: string; // backwards compatibility alias
+  dispatchedAt: string; // date and time sent
   status: 'AWAITING_ACKNOWLEDGEMENT' | 'ACKNOWLEDGED_RECEIVED';
   acknowledgedBy?: string;
   acknowledgedByRank?: string;
   acknowledgedByPersonnelNumber?: string;
-  acknowledgedAt?: string;
+  acknowledgedAt?: string; // date and time received
   acknowledgementNotes?: string;
+  currentDocketCustodian: string; // who currently has responsibility
 }
 
 export interface CaseAuditEntry {
   id: string;
   caseNumber: string;
   action: 
+    | 'CASE_REGISTERED'
     | 'DOCKET_ACCESSED'
     | 'INVESTIGATION_ENTRY_RECORDED'
     | 'DOCUMENT_ATTACHED'
@@ -109,7 +117,9 @@ export interface CaseAuditEntry {
     | 'DOCKET_MOVEMENT_INITIATED'
     | 'DOCKET_RECEIPT_ACKNOWLEDGED'
     | 'CASE_STATUS_UPDATED'
-    | 'CUSTODY_TRANSFERRED';
+    | 'CUSTODY_TRANSFERRED'
+    | 'SUPERVISORY_REVIEW_RECORDED'
+    | 'DOCKET_RETURNED_WITH_INSTRUCTIONS';
   userFullName: string;
   userRank: string;
   userPersonnelNumber: string;
@@ -153,6 +163,16 @@ export interface DetectiveCaseDocket {
     nationalId?: string;
     statementSummary: string;
   };
+
+  // Registration specifics (Who registered this case?)
+  registeredByOfficerName?: string;
+  registeredByOfficerRank?: string;
+  registeredByOfficerPersonnelNumber?: string;
+  registeredAt?: string;
+  registrationStation?: string;
+  initialCharge?: string;
+
+  // Investigating Officer
   investigatingOfficerId: string;
   investigatingOfficerName: string;
   investigatingOfficerRank: string;
@@ -161,7 +181,11 @@ export interface DetectiveCaseDocket {
   lastActivityDate: string;
   currentStatus: 'Investigation Active' | 'Evidence Analysis' | 'Docket at NPA / Court' | 'Case Finalized' | 'Suspended';
   
-  // Custody tracking
+  // Custody tracking (Who currently has responsibility? Who previously had it?)
+  previousCustodianName?: string;
+  previousCustodianRank?: string;
+  previousCustodianPersonnelNumber?: string;
+  previousCustodianDepartment?: string;
   currentCustodianName: string;
   currentCustodianRank: string;
   currentCustodianPersonnelNumber: string;

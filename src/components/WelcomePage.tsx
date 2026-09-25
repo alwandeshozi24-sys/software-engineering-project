@@ -5,6 +5,7 @@ import {
   Search, 
   ShieldCheck, 
   LogIn, 
+  UserPlus,
   Sun, 
   Moon,
   ArrowRight
@@ -14,12 +15,14 @@ import policeStationHero from '../assets/images/police_station_hero_179025389076
 
 interface WelcomePageProps {
   onSignInCitizen: () => void;
+  onCreateAccountCitizen: () => void;
   onSignInOfficial: (roleIntent?: 'officer' | 'detective' | 'commander' | 'admin') => void;
   onActionRequiresLogin: (target: 'citizen' | 'officer' | 'detective' | 'commander') => void;
 }
 
 export const WelcomePage: React.FC<WelcomePageProps> = ({
   onSignInCitizen,
+  onCreateAccountCitizen,
   onSignInOfficial,
   onActionRequiresLogin
 }) => {
@@ -47,15 +50,24 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({
         <div className="absolute inset-0 bg-black/75 backdrop-blur-[1px]" />
       </div>
 
-      {/* Top Bar - Clean minimal bar with Theme Toggle */}
+      {/* Top Bar - Clean minimal bar with Official Portal and Theme Toggle */}
       <header className="relative z-10 w-full pt-5 px-6 sm:px-10 flex items-center justify-between border-b border-white/10 pb-4">
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold tracking-tight text-white font-mono">SFEN</span>
           <span className="text-blue-500 font-semibold text-xs tracking-wider uppercase">POLICE CASE SYSTEM</span>
         </div>
 
-        {/* Right side controls: Theme toggle & Direct Sign In */}
+        {/* Right side controls: Official Portal & Darkmode Toggle */}
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            id="btn-welcome-official-portal"
+            onClick={() => onSignInOfficial()}
+            className="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-black/60 hover:bg-black text-white border border-white/20 transition-colors cursor-pointer"
+          >
+            Official Portal
+          </button>
+
           <button
             type="button"
             onClick={toggleTheme}
@@ -64,21 +76,6 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({
           >
             {isDark ? <Sun size={14} className="text-blue-400" /> : <Moon size={14} className="text-blue-400" />}
             <span className="hidden sm:inline font-mono">{isDark ? 'Light Mode' : 'Dark Mode'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onSignInOfficial()}
-            className="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-black/60 hover:bg-black text-white border border-white/20 transition-colors cursor-pointer"
-          >
-            Official Portal
-          </button>
-          <button
-            type="button"
-            onClick={onSignInCitizen}
-            className="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors cursor-pointer"
-          >
-            Citizen Sign In
           </button>
         </div>
       </header>
@@ -215,6 +212,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({
         <div className="w-full max-w-4xl my-4 border-t border-white/15" />
 
         {/* Clear Sign In Buttons at the bottom - Solid colors only (NO GRADIENTS, NO PILL SHAPES) */}
+        {/* Clear Sign In & Create Account Buttons at the bottom for Citizens/Users */}
         <div className="w-full max-w-md mx-auto flex flex-col sm:flex-row items-center justify-center gap-3 mt-2">
           
           <button
@@ -224,17 +222,17 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({
             className="w-full sm:w-1/2 py-3 px-5 rounded-md font-bold text-sm bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
           >
             <LogIn size={16} />
-            <span>Citizen Sign In</span>
+            <span>Sign In</span>
           </button>
 
           <button
             type="button"
-            id="btn-welcome-official-signin"
-            onClick={() => onSignInOfficial()}
+            id="btn-welcome-citizen-create-account"
+            onClick={onCreateAccountCitizen}
             className="w-full sm:w-1/2 py-3 px-5 rounded-md font-bold text-sm bg-black hover:bg-slate-900 text-white border border-white/30 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
           >
-            <ShieldCheck size={16} className="text-blue-500" />
-            <span>Police Official Sign In</span>
+            <UserPlus size={16} className="text-blue-400" />
+            <span>Create Account</span>
           </button>
 
         </div>

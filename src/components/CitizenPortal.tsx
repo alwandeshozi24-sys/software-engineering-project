@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { CitizenLoginCredentials, CitizenSignUpData, CitizenProfile } from '../types/auth';
 import { authenticateCitizen, registerCitizen, evaluatePasswordStrength } from '../services/authService';
+import { PasswordStrengthIndicator } from './common/PasswordStrengthIndicator';
 import { SfenLogo } from './SfenLogo';
 import { ConsentInfoModal } from './ConsentInfoModal';
 import { useTheme } from '../context/ThemeContext';
@@ -25,15 +26,23 @@ interface CitizenPortalProps {
   onSuccess: (citizen: CitizenProfile) => void;
   onForgotPassword: (identifier: string) => void;
   targetRoleNotice?: string | null;
+  initialMode?: 'login' | 'signup';
 }
 
 export const CitizenPortal: React.FC<CitizenPortalProps> = ({
   onSuccess,
   onForgotPassword,
-  targetRoleNotice
+  targetRoleNotice,
+  initialMode = 'login'
 }) => {
   const { isDark } = useTheme();
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>(initialMode);
+
+  useEffect(() => {
+    if (initialMode) {
+      setAuthMode(initialMode);
+    }
+  }, [initialMode]);
   
   // Login State
   const [loginEmail, setLoginEmail] = useState('');
@@ -492,6 +501,13 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
                 {showSignUpPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
+
+            {/* Live Password Strength and Instructions */}
+            <PasswordStrengthIndicator
+              password={signUpPassword}
+              strength={passwordStrength}
+              isDark={isDark}
+            />
           </div>
 
           {/* Confirm Password */}

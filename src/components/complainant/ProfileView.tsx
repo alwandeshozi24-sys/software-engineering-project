@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CitizenProfile } from '../../types/auth';
 import { evaluatePasswordStrength } from '../../services/authService';
+import { PasswordStrengthIndicator } from '../common/PasswordStrengthIndicator';
 import { 
   User, 
   Mail, 
@@ -299,29 +300,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ citizen, onUpdateCitiz
             </div>
           </div>
 
-          {/* Password Security Score */}
-          {newPassword.length > 0 && (
-            <div className={`p-3 rounded-md border space-y-1.5 text-xs ${
-              isDark ? 'bg-black border-slate-800' : 'bg-white border-slate-200'
-            }`}>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400 font-medium">Password Security Score:</span>
-                <span className="font-bold font-mono text-blue-600">
-                  {passwordStrength.label} ({passwordStrength.score}/5)
-                </span>
-              </div>
-              <div className="w-full bg-slate-800 h-1.5 rounded-sm overflow-hidden flex gap-1">
-                {[1, 2, 3, 4, 5].map((level) => (
-                  <div
-                    key={level}
-                    className={`flex-1 h-full ${
-                      level <= passwordStrength.score ? 'bg-blue-600' : 'bg-transparent'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Password Security Score & Instructions */}
+          <PasswordStrengthIndicator
+            password={newPassword}
+            strength={passwordStrength}
+            isDark={isDark}
+          />
 
           <div className="flex justify-end pt-2">
             <button

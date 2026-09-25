@@ -7,6 +7,7 @@ import {
   UserCheck, 
   LogOut
 } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface AdminSidebarProps {
   activeTab: AdminTab;
@@ -22,11 +23,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   activeTab,
   onSelectTab,
   userCount,
-  personnelCount,
   onSignOut,
   isMobileDrawer = false,
   onCloseMobileDrawer
 }) => {
+  const { isDark } = useTheme();
+
   const handleNav = (tab: AdminTab) => {
     onSelectTab(tab);
     if (isMobileDrawer && onCloseMobileDrawer) {
@@ -39,28 +41,26 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     label: string;
     icon: React.ElementType;
     badge?: number | string;
-    badgeColor?: string;
   }> = [
     {
       id: 'dashboard',
-      label: 'Dashboard',
+      label: 'Admin Overview',
       icon: LayoutDashboard
     },
     {
       id: 'users',
-      label: 'Users',
+      label: 'Users & Roles',
       icon: Users,
-      badge: userCount,
-      badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+      badge: userCount
     },
     {
       id: 'activity',
-      label: 'System Activity',
+      label: 'System Activity Logs',
       icon: Activity
     },
     {
       id: 'profile',
-      label: 'Profile',
+      label: 'Admin Profile',
       icon: UserCheck
     }
   ];
@@ -69,66 +69,80 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     <aside 
       id={isMobileDrawer ? 'admin-mobile-drawer' : 'admin-desktop-sidebar'}
       className={`flex flex-col justify-between ${
-        isMobileDrawer ? 'w-full py-2' : 'w-64 py-6 pr-4'
-      }`}
+        isMobileDrawer ? 'w-full py-2' : 'w-64 py-6 pr-6 border-r'
+      } ${isDark ? 'border-white/10' : 'border-black/10'}`}
     >
       <div className="space-y-6">
         {/* Navigation Group */}
-        <nav className="space-y-1.5" aria-label="System Administrator navigation">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
+        <div className="space-y-1">
+          <p className={`text-[10px] font-bold uppercase tracking-wider px-3 pb-2 border-b ${
+            isDark ? 'text-slate-400 border-white/10' : 'text-slate-600 border-black/10'
+          }`}>
+            System Administration
+          </p>
 
-            return (
-              <button
-                key={item.id}
-                id={`admin-nav-${item.id}`}
-                type="button"
-                onClick={() => handleNav(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-purple-600 text-white shadow-xs'
-                    : 'bg-slate-900/60 hover:bg-slate-900 border border-transparent hover:border-slate-800 text-slate-300 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Icon 
-                    size={16} 
-                    className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-purple-400'} 
-                  />
-                  <span>{item.label}</span>
-                </div>
+          <nav className="divide-y divide-white/5 pt-1" aria-label="System Administrator navigation">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
 
-                {item.badge !== undefined && (
-                  <span
-                    className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+              return (
+                <button
+                  key={item.id}
+                  id={`admin-nav-${item.id}`}
+                  type="button"
+                  onClick={() => handleNav(item.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium transition-colors cursor-pointer border-l-2 text-left ${
+                    isActive
+                      ? 'border-blue-600 text-blue-600 font-bold'
+                      : isDark
+                        ? 'border-transparent text-slate-300 hover:text-white hover:bg-slate-900/40'
+                        : 'border-transparent text-slate-700 hover:text-black hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon 
+                      size={16} 
+                      className={isActive ? 'text-blue-600' : isDark ? 'text-slate-400' : 'text-slate-500'} 
+                    />
+                    <span>{item.label}</span>
+                  </div>
+
+                  {item.badge !== undefined && (
+                    <span className={`text-[10px] font-mono px-1.5 py-0.5 border ${
                       isActive 
-                        ? 'bg-white/20 text-white border-white/30' 
-                        : item.badgeColor || 'bg-slate-800 text-slate-400 border-slate-700'
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+                        ? 'border-blue-600 text-blue-600' 
+                        : isDark
+                          ? 'border-white/20 text-slate-300'
+                          : 'border-black/20 text-slate-700'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
       </div>
 
       {/* Logout button at bottom of drawer/sidebar */}
-      <div className="pt-4 border-t border-slate-800/80">
+      <div className={`pt-4 border-t ${isDark ? 'border-white/10' : 'border-black/10'}`}>
         <button
           type="button"
           id="admin-sidebar-logout"
           onClick={onSignOut}
-          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-rose-500/10 border border-slate-800 hover:border-rose-500/40 text-slate-300 hover:text-rose-300 text-xs font-semibold transition-all cursor-pointer shadow-xs"
+          className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium border transition-colors cursor-pointer ${
+            isDark 
+              ? 'border-white/10 text-slate-300 hover:bg-slate-900 hover:text-white' 
+              : 'border-black/10 text-slate-700 hover:bg-slate-100 hover:text-black'
+          }`}
         >
           <div className="flex items-center gap-2">
-            <LogOut size={15} />
+            <LogOut size={14} className="text-blue-600" />
             <span>Sign Out</span>
           </div>
-          <span className="text-[10px] font-mono text-slate-400">Exit Admin</span>
+          <span className="text-[10px] font-mono text-slate-500">Exit Admin</span>
         </button>
       </div>
     </aside>

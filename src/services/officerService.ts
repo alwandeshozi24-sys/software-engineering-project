@@ -414,7 +414,12 @@ export const officerService = {
 
     saveToStorage(STORAGE_KEYS.CASES, [newCase, ...cases]);
 
-    // Record Initial Docket Movement
+    // Find assigned or target detective
+    const targetDet = SEED_DETECTIVES.find(d => d.personnelNumber === input.assignedDetectivePersonnelNumber) || 
+                      SEED_DETECTIVES.find(d => d.personnelNumber === 'POL-20491') || 
+                      SEED_DETECTIVES[0];
+
+    // Record Initial Docket Movement in Officer Movements
     const movements = this.getDocketMovements();
     const newMovement: DocketMovementRecord = {
       id: `mov_${Date.now()}`,
@@ -423,7 +428,7 @@ export const officerService = {
       offence: input.incidentType || report.incidentType,
       complainantName: report.complainantName,
       origin: 'SAPS Sandton Police Station',
-      destination: input.initialDocketDestination || 'Detective Branch - General Crimes Desk',
+      destination: input.initialDocketDestination || `${targetDet.desk} - Docket Handover`,
       initiatedBy: `${officer.rank} ${officer.fullName}`,
       initiatedByPersonnelNumber: officer.personnelNumber,
       initiatedByRank: officer.rank,
@@ -432,6 +437,113 @@ export const officerService = {
       status: 'AWAITING_RECEIPT'
     };
     saveToStorage(STORAGE_KEYS.MOVEMENTS, [newMovement, ...movements]);
+
+    // Sync into sfen_detective_dockets so Detective and Station Commander immediately see the case
+    try {
+      const detectiveDockets = loadFromStorage<any[]>('sfen_detective_dockets', []);
+      const newDetectiveDocket = {
+        id: `det_cas_${Date.now()}`,
+        caseNumber: officialCasNumber,
+        reportReference: report.referenceNumber,
+        incidentType: input.incidentType || report.incidentType,
+        offenceSubcategory: input.chargeDescription || report.incidentType,
+        policeStation: DEFAULT_STATION_NAME,
+        dateReported: now.toISOString().split('T')[0],
+        incidentDate: input.incidentDate || report.incidentDate,
+        incidentTime: input.incidentTime || report.incidentTime,
+        incidentLocation: {
+          address: input.locationAddress || report.location?.address || 'Sandton Precinct',
+          suburb: input.locationSuburb || report.location?.suburb || 'Sandton',
+          city: 'Johannesburg',
+          province: 'Gauteng'
+        },
+        complainant: {
+          fullName: report.complainantName,
+          phoneNumber: report.complainantPhone,
+          email: report.complainantEmail || '',
+          statementSummary: input.officerIntakeNotes || report.description
+        },
+        registeredByOfficerName: officer.fullName,
+        registeredByOfficerRank: officer.rank,
+        registeredByOfficerPersonnelNumber: officer.personnelNumber,
+        registeredAt: now.toISOString(),
+        registrationStation: officer.station || DEFAULT_STATION_NAME,
+        initialCharge: `${input.chargeDescription} (${input.statutoryCode})`,
+        investigatingOfficerId: targetDet.id,
+        investigatingOfficerName: targetDet.fullName,
+        investigatingOfficerRank: targetDet.rank,
+        investigatingOfficerPersonnelNumber: targetDet.personnelNumber,
+        assignedDate: now.toISOString().split('T')[0],
+        lastActivityDate: now.toISOString().split('T')[0],
+        currentStatus: 'Investigation Active',
+        currentCustodianName: `${officer.rank} ${officer.fullName}`,
+        currentCustodianRank: officer.rank,
+        currentCustodianPersonnelNumber: officer.personnelNumber,
+        currentCustodianDepartment: 'Community Service Centre (CSC) Frontline Intake',
+        custodyStatus: 'TRANSFERRED_AWAITING_RECEIPT',
+        isCustodyAcknowledgedByDetective: false,
+        statutoryCode: input.statutoryCode,
+        priorityLevel: input.priorityLevel || 'Standard',
+        scheduledReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      };
+      saveToStorage('sfen_detective_dockets', [newDetectiveDocket, ...detectiveDockets]);
+
+      // Sync into sfen_detective_movements with full custody fields
+      const detectiveMovements = loadFromStorage<any[]>('sfen_detective_movements', []);
+      const newDetMovement = {
+        id: `det_mov_${Date.now()}`,
+        caseNumber: officialCasNumber,
+        previousCustodian: `${officer.rank} ${officer.fullName} (${officer.personnelNumber})`,
+        newCustodian: `${targetDet.rank} ${targetDet.fullName} (${targetDet.personnelNumber})`,
+        senderName: officer.fullName,
+        senderRank: officer.rank,
+        senderPersonnelNumber: officer.personnelNumber,
+        senderStation: officer.station || DEFAULT_STATION_NAME,
+        destination: input.initialDocketDestination || `${targetDet.desk} - Handover`,
+        intendedRecipientName: targetDet.fullName,
+        recipientName: targetDet.fullName,
+        recipientRank: targetDet.rank,
+        recipientPersonnelNumber: targetDet.personnelNumber,
+        reasonForMovement: `Official case registration at CSC desk. Transferred to ${targetDet.rank} ${targetDet.fullName} for criminal investigation. Charge: ${input.chargeDescription}.`,
+        movementReason: `Official case registration at CSC desk. Transferred to ${targetDet.rank} ${targetDet.fullName} for criminal investigation. Charge: ${input.chargeDescription}.`,
+        dispatchedAt: now.toISOString(),
+        status: 'AWAITING_ACKNOWLEDGEMENT',
+        currentDocketCustodian: `${officer.rank} ${officer.fullName} (${officer.personnelNumber})`
+      };
+      saveToStorage('sfen_detective_movements', [newDetMovement, ...detectiveMovements]);
+
+      // Sync into sfen_detective_audit_trails
+      const detectiveAudits = loadFromStorage<any[]>('sfen_detective_audit_trails', []);
+      const newAudit = {
+        id: `aud_${Date.now()}_reg`,
+        caseNumber: officialCasNumber,
+        action: 'CASE_REGISTERED',
+        userFullName: officer.fullName,
+        userRank: officer.rank,
+        userPersonnelNumber: officer.personnelNumber,
+        userRole: 'Police Officer (CSC)',
+        description: `Officially registered case ${officialCasNumber} from report ${report.referenceNumber}. Assigned to Investigating Officer ${targetDet.rank} ${targetDet.fullName}. Awaiting receipt acknowledgement.`,
+        timestamp: now.toISOString(),
+        securityHash: `SHA256:REG${Date.now().toString(16).toUpperCase()}`
+      };
+      saveToStorage('sfen_detective_audit_trails', [newAudit, ...detectiveAudits]);
+
+      // Notify the Detective
+      const detectiveNotifs = loadFromStorage<any[]>('sfen_detective_notifications', []);
+      const detNotif = {
+        id: `notif_det_${Date.now()}`,
+        type: 'ASSIGNMENT',
+        title: `New Case Docket Assigned: ${officialCasNumber}`,
+        message: `Constable ${officer.fullName} at CSC has registered case ${officialCasNumber} (${input.incidentType}) and handed the docket over to you. Please acknowledge custody.`,
+        caseNumber: officialCasNumber,
+        timestamp: now.toISOString(),
+        read: false,
+        priority: 'high'
+      };
+      saveToStorage('sfen_detective_notifications', [detNotif, ...detectiveNotifs]);
+    } catch {
+      // safe fallback
+    }
 
     // Log Action in Registration Traceability
     this.logAction({

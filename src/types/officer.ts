@@ -79,6 +79,7 @@ export interface CaseRegistrationInput {
   statutoryCode: string;
   priorityLevel: 'Standard' | 'Urgent' | 'High Priority';
   initialDocketDestination: string;
+  assignedDetectivePersonnelNumber?: string;
   officerIntakeNotes: string;
 }
 

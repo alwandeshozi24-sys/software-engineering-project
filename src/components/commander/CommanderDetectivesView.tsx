@@ -2,18 +2,13 @@ import React, { useState } from 'react';
 import { CommanderDetectiveWorkload } from '../../types/commander';
 import { DetectiveCaseDocket } from '../../types/detective';
 import { 
-  Users, 
   Briefcase, 
-  Clock, 
-  ClipboardList, 
   Mail, 
   Phone, 
-  FolderOpen, 
   ArrowRight,
-  ShieldCheck,
-  CheckCircle2,
   AlertTriangle
 } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface CommanderDetectivesViewProps {
   detectivesWorkload: CommanderDetectiveWorkload[];
@@ -28,11 +23,8 @@ export const CommanderDetectivesView: React.FC<CommanderDetectivesViewProps> = (
   onOpenCase,
   onFilterCasesByDetective
 }) => {
+  const { isDark } = useTheme();
   const [selectedDetectiveNumber, setSelectedDetectiveNumber] = useState<string | null>(null);
-
-  const selectedWorkload = detectivesWorkload.find(
-    w => w.detective.personnelNumber === selectedDetectiveNumber
-  );
 
   const selectedDetectiveCases = selectedDetectiveNumber
     ? cases.filter(c => c.investigatingOfficerPersonnelNumber === selectedDetectiveNumber)
@@ -44,22 +36,22 @@ export const CommanderDetectivesView: React.FC<CommanderDetectivesViewProps> = (
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-extrabold text-white tracking-tight">
+          <h2 className={`text-2xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
             Station Detectives & Workload Supervision
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
             Supervise investigating officer caseloads, pending directives, and docket custody under station command
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-slate-400">
-            <strong className="text-emerald-400">{detectivesWorkload.length}</strong> Authorized Investigating Officers
+          <span className={`text-xs font-mono ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+            <strong className="text-blue-600 font-bold">{detectivesWorkload.length}</strong> Authorized Investigating Officers
           </span>
         </div>
       </div>
 
-      {/* Detectives Grid / Cards */}
+      {/* Detectives Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {detectivesWorkload.map((item) => {
           const det = item.detective;
@@ -68,80 +60,88 @@ export const CommanderDetectivesView: React.FC<CommanderDetectivesViewProps> = (
           return (
             <div
               key={det.personnelNumber}
-              className={`p-5 rounded-2xl border transition-all flex flex-col justify-between gap-4 ${
+              className={`p-5 rounded-md border transition-colors flex flex-col justify-between gap-4 ${
                 isSelected
-                  ? 'bg-slate-900 border-emerald-500/50 shadow-md'
-                  : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
+                  ? isDark ? 'bg-black border-blue-600 shadow-md' : 'bg-white border-blue-600 shadow-md'
+                  : isDark ? 'bg-black border-white/10 hover:border-white/20' : 'bg-white border-black/10 hover:border-black/20'
               }`}
             >
               {/* Top details */}
               <div className="space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-emerald-400 font-bold flex items-center justify-center text-sm font-mono">
+                    <div className="w-10 h-10 rounded bg-blue-600 flex items-center justify-center font-bold text-sm text-white font-mono uppercase">
                       {det.fullName.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                      <h3 className={`text-sm font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-black'}`}>
                         <span>{det.rank} {det.fullName}</span>
-                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-amber-300">
+                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded border border-blue-600 text-blue-600 bg-blue-600/5">
                           {det.personnelNumber}
                         </span>
                       </h3>
-                      <p className="text-xs text-slate-400">
+                      <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                         {det.division}
                       </p>
                     </div>
                   </div>
 
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono border border-emerald-500/30 text-emerald-600 bg-emerald-500/10">
                     {det.status}
                   </span>
                 </div>
 
                 {/* Specialization & Contact */}
-                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1.5 text-xs text-slate-400">
-                  <div className="text-slate-300">
-                    <strong className="text-slate-400">Focus:</strong> {det.specialization}
+                <div className={`p-3 rounded-md border space-y-1.5 text-xs ${
+                  isDark ? 'bg-slate-900/40 border-white/10 text-slate-300' : 'bg-slate-50 border-black/10 text-slate-700'
+                }`}>
+                  <div>
+                    <strong className={isDark ? 'text-slate-400' : 'text-slate-500'}>Focus:</strong> {det.specialization}
                   </div>
                   <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono pt-1">
                     <span className="flex items-center gap-1">
-                      <Phone size={11} className="text-slate-500" />
+                      <Phone size={11} className="text-slate-400" />
                       <span>{det.phone}</span>
                     </span>
                     <span className="flex items-center gap-1">
-                      <Mail size={11} className="text-slate-500" />
+                      <Mail size={11} className="text-slate-400" />
                       <span>{det.email}</span>
                     </span>
                   </div>
                 </div>
 
-                {/* Workload Metrics (Clean supervision, no gamified ranking) */}
+                {/* Workload Metrics */}
                 <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <span className="text-[10px] text-slate-400 block mb-0.5">Active Cases</span>
-                    <strong className="text-sm font-bold font-mono text-white">
+                  <div className={`p-2.5 rounded-md border ${
+                    isDark ? 'bg-slate-900/30 border-white/10' : 'bg-slate-50 border-black/10'
+                  }`}>
+                    <span className={`text-[10px] block mb-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Active Cases</span>
+                    <strong className={`text-sm font-bold font-mono ${isDark ? 'text-white' : 'text-black'}`}>
                       {item.activeAssignedCasesCount}
                     </strong>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <span className="text-[10px] text-slate-400 block mb-0.5">Pending Directives</span>
-                    <strong className={`text-sm font-bold font-mono ${item.outstandingDirectivesCount > 0 ? 'text-purple-400' : 'text-slate-400'}`}>
+                  <div className={`p-2.5 rounded-md border ${
+                    isDark ? 'bg-slate-900/30 border-white/10' : 'bg-slate-50 border-black/10'
+                  }`}>
+                    <span className={`text-[10px] block mb-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Directives</span>
+                    <strong className={`text-sm font-bold font-mono ${item.outstandingDirectivesCount > 0 ? 'text-blue-600' : isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                       {item.outstandingDirectivesCount}
                     </strong>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <span className="text-[10px] text-slate-400 block mb-0.5">Reviews Due</span>
-                    <strong className={`text-sm font-bold font-mono ${item.casesRequiringReviewCount > 0 ? 'text-rose-400' : 'text-slate-400'}`}>
+                  <div className={`p-2.5 rounded-md border ${
+                    isDark ? 'bg-slate-900/30 border-white/10' : 'bg-slate-50 border-black/10'
+                  }`}>
+                    <span className={`text-[10px] block mb-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Reviews Due</span>
+                    <strong className={`text-sm font-bold font-mono ${item.casesRequiringReviewCount > 0 ? 'text-red-500' : isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                       {item.casesRequiringReviewCount}
                     </strong>
                   </div>
                 </div>
 
                 {item.unacknowledgedDocketsCount > 0 && (
-                  <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 flex items-center gap-2">
+                  <div className="p-2 rounded border border-amber-500/30 text-[11px] text-amber-500 bg-amber-500/10 flex items-center gap-2">
                     <AlertTriangle size={13} className="shrink-0" />
                     <span>{item.unacknowledgedDocketsCount} docket transfer(s) awaiting detective receipt signature.</span>
                   </div>
@@ -149,7 +149,9 @@ export const CommanderDetectivesView: React.FC<CommanderDetectivesViewProps> = (
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2">
+              <div className={`pt-2 border-t flex items-center justify-between gap-2 ${
+                isDark ? 'border-white/10' : 'border-black/10'
+              }`}>
                 <button
                   type="button"
                   onClick={() => {
@@ -157,7 +159,9 @@ export const CommanderDetectivesView: React.FC<CommanderDetectivesViewProps> = (
                       selectedDetectiveNumber === det.personnelNumber ? null : det.personnelNumber
                     );
                   }}
-                  className="text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className={`text-xs font-semibold hover:underline flex items-center gap-1.5 transition-colors cursor-pointer ${
+                    isDark ? 'text-slate-300' : 'text-slate-700'
+                  }`}
                 >
                   <span>{isSelected ? 'Hide Case List' : 'Inspect Active Dockets'}</span>
                 </button>
@@ -165,79 +169,52 @@ export const CommanderDetectivesView: React.FC<CommanderDetectivesViewProps> = (
                 <button
                   type="button"
                   onClick={() => onFilterCasesByDetective(det.personnelNumber)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-700"
+                  className={`px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border ${
+                    isDark ? 'bg-black border-white/20 text-white hover:bg-slate-900' : 'bg-white border-black/20 text-black hover:bg-slate-100'
+                  }`}
                 >
-                  <Briefcase size={13} className="text-emerald-400" />
+                  <Briefcase size={13} className="text-blue-600" />
                   <span>View in Cases</span>
-                  <ArrowRight size={12} className="text-slate-400" />
+                  <ArrowRight size={12} />
                 </button>
               </div>
+
+              {/* Expanded case list if selected */}
+              {isSelected && (
+                <div className={`mt-3 p-3 rounded-md border space-y-2 ${
+                  isDark ? 'bg-slate-950 border-white/10' : 'bg-slate-50 border-black/10'
+                }`}>
+                  <p className="text-xs font-bold text-blue-600">
+                    Assigned Dockets ({selectedDetectiveCases.length})
+                  </p>
+                  {selectedDetectiveCases.length === 0 ? (
+                    <p className="text-xs text-slate-400">No active dockets assigned.</p>
+                  ) : (
+                    <div className="space-y-1 max-h-48 overflow-y-auto">
+                      {selectedDetectiveCases.map((c) => (
+                        <div 
+                          key={c.id}
+                          onClick={() => onOpenCase(c)}
+                          className={`p-2 rounded border text-xs flex items-center justify-between cursor-pointer ${
+                            isDark ? 'bg-black border-white/5 hover:border-white/20' : 'bg-white border-black/5 hover:border-black/20'
+                          }`}
+                        >
+                          <div>
+                            <span className="font-mono font-bold text-blue-600">{c.caseNumber}</span>
+                            <span className="ml-2">{c.incidentType}</span>
+                          </div>
+                          <span className="text-[10px] font-mono text-slate-400">{c.currentStatus}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
             </div>
           );
         })}
       </div>
-
-      {/* Selected Detective Docket Breakdown */}
-      {selectedWorkload && (
-        <div className="p-5 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 animate-in fade-in">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div>
-              <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                <span>Dockets Allocated to {selectedWorkload.detective.rank} {selectedWorkload.detective.fullName}</span>
-                <span className="text-xs font-mono text-amber-400">
-                  ({selectedDetectiveCases.length} dockets)
-                </span>
-              </h3>
-              <p className="text-xs text-slate-400">
-                Click any docket to open the supervisory workspace
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setSelectedDetectiveNumber(null)}
-              className="text-xs text-slate-400 hover:text-white cursor-pointer"
-            >
-              Close
-            </button>
-          </div>
-
-          {selectedDetectiveCases.length === 0 ? (
-            <div className="p-6 text-center text-xs text-slate-400">
-              No active cases currently allocated to this detective.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {selectedDetectiveCases.map((c) => (
-                <div
-                  key={c.id}
-                  onClick={() => onOpenCase(c, 'overview')}
-                  className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-emerald-500/40 hover:bg-slate-850 transition-all cursor-pointer space-y-1.5"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-amber-300">
-                      {c.caseNumber}
-                    </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">
-                      {c.currentStatus}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-white font-semibold truncate">
-                    {c.incidentType}
-                  </p>
-
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-1 border-t border-slate-800/60">
-                    <span>Custodian: {c.currentCustodianName.split(' ')[0]}</span>
-                    <span>Last Act: {c.lastActivityDate}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
     </div>
   );

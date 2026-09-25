@@ -32,6 +32,7 @@ function AppContent() {
 
   // Citizen Session State
   const [authenticatedCitizen, setAuthenticatedCitizen] = useState<CitizenProfile | null>(null);
+  const [citizenAuthMode, setCitizenAuthMode] = useState<'login' | 'signup'>('login');
 
   // Shared Modals
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
@@ -228,6 +229,13 @@ function AppContent() {
         <WelcomePage
           onSignInCitizen={() => {
             setActivePortal('citizen');
+            setCitizenAuthMode('login');
+            setTargetRoleNotice(null);
+            setViewMode('portal');
+          }}
+          onCreateAccountCitizen={() => {
+            setActivePortal('citizen');
+            setCitizenAuthMode('signup');
             setTargetRoleNotice(null);
             setViewMode('portal');
           }}
@@ -342,6 +350,7 @@ function AppContent() {
               onSuccess={handleCitizenLoginSuccess}
               onForgotPassword={handleOpenForgotPassword}
               targetRoleNotice={targetRoleNotice}
+              initialMode={citizenAuthMode}
             />
 
             {/* Quick Demo Access for Complainant */}

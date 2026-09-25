@@ -5,6 +5,7 @@ import { DetectiveCaseDocket } from '../../types/detective';
 import { CommanderDetectivesView } from './CommanderDetectivesView';
 import { CommanderComplaintsView } from './CommanderComplaintsView';
 import { Users, AlertCircle } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface CommanderDetectivesAndComplaintsViewProps {
   commander: UserProfile;
@@ -29,6 +30,7 @@ export const CommanderDetectivesAndComplaintsView: React.FC<CommanderDetectivesA
   onFilterCasesByDetective,
   onRefreshComplaints
 }) => {
+  const { isDark } = useTheme();
   const [subTab, setSubTab] = useState<'detectives' | 'complaints'>(initialSubTab);
 
   const pendingComplaintsCount = complaints.filter(
@@ -41,30 +43,38 @@ export const CommanderDetectivesAndComplaintsView: React.FC<CommanderDetectivesA
       {/* Combined Header & Sub-Tab Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1 pb-1">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h2 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
+            isDark ? 'text-white' : 'text-black'
+          }`}>
             Personnel & Grievances Oversight
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
             Supervise CID detective caseload allocations alongside citizen service delivery complaints
           </p>
         </div>
 
         {/* Sub-Tab Switcher */}
-        <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm">
+        <div className={`flex items-center gap-1.5 p-1.5 rounded-md border shadow-sm ${
+          isDark ? 'bg-black border-white/10' : 'bg-white border-black/10'
+        }`}>
           <button
             type="button"
             id="btn-subtab-detectives"
             onClick={() => setSubTab('detectives')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all cursor-pointer ${
               subTab === 'detectives'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : isDark 
+                  ? 'text-slate-400 hover:text-white hover:bg-slate-900' 
+                  : 'text-slate-600 hover:text-black hover:bg-slate-100'
             }`}
           >
             <Users size={15} />
             <span>Detectives</span>
-            <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
-              subTab === 'detectives' ? 'bg-black/20 text-white' : 'bg-slate-800 text-slate-400'
+            <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md ${
+              subTab === 'detectives' 
+                ? 'bg-black/20 text-white' 
+                : isDark ? 'bg-slate-900 text-slate-400' : 'bg-slate-100 text-slate-600'
             }`}>
               {detectivesWorkload.length}
             </span>
@@ -74,21 +84,25 @@ export const CommanderDetectivesAndComplaintsView: React.FC<CommanderDetectivesA
             type="button"
             id="btn-subtab-complaints"
             onClick={() => setSubTab('complaints')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all cursor-pointer ${
               subTab === 'complaints'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : isDark 
+                  ? 'text-slate-400 hover:text-white hover:bg-slate-900' 
+                  : 'text-slate-600 hover:text-black hover:bg-slate-100'
             }`}
           >
             <AlertCircle size={15} />
             <span>Complaints</span>
             {pendingComplaintsCount > 0 ? (
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-500 text-white font-extrabold ">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-rose-600 text-white font-extrabold">
                 {pendingComplaintsCount} new
               </span>
             ) : (
-              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
-                subTab === 'complaints' ? 'bg-black/20 text-white' : 'bg-slate-800 text-slate-400'
+              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md ${
+                subTab === 'complaints' 
+                  ? 'bg-black/20 text-white' 
+                  : isDark ? 'bg-slate-900 text-slate-400' : 'bg-slate-100 text-slate-600'
               }`}>
                 {complaints.length}
               </span>

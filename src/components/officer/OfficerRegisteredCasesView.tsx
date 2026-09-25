@@ -57,8 +57,8 @@ export const OfficerRegisteredCasesView: React.FC<OfficerRegisteredCasesViewProp
         );
       case 'Docket at NPA / Court':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30">
-            <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/15 text-blue-300 border border-blue-500/30">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
             Docket at NPA / Court
           </span>
         );
@@ -158,7 +158,7 @@ export const OfficerRegisteredCasesView: React.FC<OfficerRegisteredCasesViewProp
                     {c.caseNumber}
                   </span>
                   {c.reportReference && (
-                    <span className="font-mono text-[11px] text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20">
+                    <span className="font-mono text-[11px] text-blue-300 bg-blue-500/10 px-2 py-0.5 rounded-md border border-blue-500/20">
                       Linked: {c.reportReference}
                     </span>
                   )}
@@ -265,7 +265,7 @@ export const OfficerRegisteredCasesView: React.FC<OfficerRegisteredCasesViewProp
                   {selectedCase.reportReference && (
                     <div className="flex justify-between">
                       <span className="text-slate-400">Linked Online Report:</span>
-                      <span className="font-mono text-purple-300 font-bold">{selectedCase.reportReference}</span>
+                      <span className="font-mono text-blue-300 font-bold">{selectedCase.reportReference}</span>
                     </div>
                   )}
                   <div className="flex justify-between">

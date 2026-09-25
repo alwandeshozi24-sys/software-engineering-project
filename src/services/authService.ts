@@ -65,16 +65,16 @@ export const ROLE_DETAILS: Record<UserRole, { label: string; clearance: string; 
     themeColor: 'amber'
   },
   COMMANDER: {
-    label: 'Commander / Supervisor',
-    clearance: 'Level 3 - Station Command & Docket Authorization',
+    label: 'Station Commander',
+    clearance: 'Level 3 - Station Command & Investigation Supervisory Oversight',
     redirectTarget: '/dashboard/commander',
     themeColor: 'emerald'
   },
   ADMINISTRATOR: {
     label: 'System Administrator',
-    clearance: 'Level 4 - National Security & Full Docket Audits',
+    clearance: 'Level 4 - User Accounts, Roles, Security & System Administration',
     redirectTarget: '/dashboard/admin',
-    themeColor: 'purple'
+    themeColor: 'blue'
   }
 };
 

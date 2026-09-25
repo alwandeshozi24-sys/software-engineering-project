@@ -10,6 +10,8 @@ import {
   CaseAuditEntry
 } from '../../types/detective';
 import { detectiveService } from '../../services/detectiveService';
+import { commanderService } from '../../services/commanderService';
+import { CaseLifecycleProvenanceLedger } from '../common/CaseLifecycleProvenanceLedger';
 import { 
   X, 
   FileText, 
@@ -591,6 +593,19 @@ export const DetectiveCaseWorkspaceModal: React.FC<DetectiveCaseWorkspaceModalPr
                   </div>
                 </div>
 
+              </div>
+
+              {/* Comprehensive 9-Question Case Provenance & Custody Ledger */}
+              <div className="pt-2">
+                <CaseLifecycleProvenanceLedger
+                  caseDocket={currentCase}
+                  movements={movements}
+                  diaryEntries={diaryEntries}
+                  instructions={instructions}
+                  auditEntries={auditLogs}
+                  reviews={commanderService.getSupervisoryReviews(currentCase.caseNumber)}
+                  initialExpanded={true}
+                />
               </div>
 
             </div>

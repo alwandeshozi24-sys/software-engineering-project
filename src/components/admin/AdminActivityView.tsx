@@ -3,10 +3,8 @@ import { AdminActivityLog, AdminActivityType } from '../../types/admin';
 import { 
   Activity, 
   Search, 
-  Filter, 
   Calendar, 
   User, 
-  ShieldCheck, 
   Download, 
   CheckCircle2, 
   KeyRound, 
@@ -14,15 +12,16 @@ import {
   Building2, 
   UserPlus, 
   XCircle,
-  FileText,
   X
 } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface AdminActivityViewProps {
   activityLogs: AdminActivityLog[];
 }
 
 export const AdminActivityView: React.FC<AdminActivityViewProps> = ({ activityLogs }) => {
+  const { isDark } = useTheme();
   const [filterType, setFilterType] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -57,56 +56,56 @@ export const AdminActivityView: React.FC<AdminActivityViewProps> = ({ activityLo
     switch (type) {
       case 'ACCOUNT_CREATED':
         return (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/15 border border-blue-500/30 text-blue-300">
+          <span className="flex items-center gap-1 px-2 py-0.5 border border-blue-600/30 bg-blue-600/10 text-blue-600 text-[10px] font-mono font-bold">
             <UserPlus size={11} />
             <span>Account Created</span>
           </span>
         );
       case 'ACCOUNT_ACTIVATED':
         return (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
+          <span className="flex items-center gap-1 px-2 py-0.5 border border-emerald-600/30 bg-emerald-600/10 text-emerald-600 text-[10px] font-mono font-bold">
             <CheckCircle2 size={11} />
             <span>Account Activated</span>
           </span>
         );
       case 'ACCOUNT_DEACTIVATED':
         return (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/15 border border-rose-500/30 text-rose-300">
+          <span className="flex items-center gap-1 px-2 py-0.5 border border-red-600/30 bg-red-600/10 text-red-600 text-[10px] font-mono font-bold">
             <XCircle size={11} />
             <span>Account Deactivated</span>
           </span>
         );
       case 'ROLE_CHANGED':
         return (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-purple-500/15 border border-purple-500/30 text-purple-300">
+          <span className="flex items-center gap-1 px-2 py-0.5 border border-blue-600/30 bg-blue-600/10 text-blue-600 text-[10px] font-mono font-bold">
             <RefreshCw size={11} />
             <span>Role Reassigned</span>
           </span>
         );
       case 'PASSWORD_RESET':
         return (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-300">
+          <span className="flex items-center gap-1 px-2 py-0.5 border border-amber-600/30 bg-amber-600/10 text-amber-600 text-[10px] font-mono font-bold">
             <KeyRound size={11} />
             <span>Password Reset</span>
           </span>
         );
       case 'STATION_UPDATED':
         return (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-cyan-500/15 border border-cyan-500/30 text-cyan-300">
+          <span className="flex items-center gap-1 px-2 py-0.5 border border-blue-600/30 bg-blue-600/10 text-blue-600 text-[10px] font-mono font-bold">
             <Building2 size={11} />
             <span>Station Updated</span>
           </span>
         );
       case 'PROFILE_UPDATED':
         return (
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-500/15 border border-slate-500/30 text-slate-300">
+          <span className="flex items-center gap-1 px-2 py-0.5 border border-slate-500/30 bg-slate-500/10 text-slate-400 text-[10px] font-mono font-bold">
             <User size={11} />
             <span>Profile Updated</span>
           </span>
         );
       default:
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-400">
+          <span className="px-2 py-0.5 border border-slate-500/30 text-slate-400 text-[10px] font-mono">
             {type}
           </span>
         );
@@ -115,13 +114,13 @@ export const AdminActivityView: React.FC<AdminActivityViewProps> = ({ activityLo
 
   return (
     <div id="admin-activity-view" className="space-y-6">
-      {/* Floating Header */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1 pb-1">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h2 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
             System Activity & Audit Log
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className={`text-xs mt-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
             Immutable trace of administrative events, account modifications, and security operations.
           </p>
         </div>
@@ -130,23 +129,33 @@ export const AdminActivityView: React.FC<AdminActivityViewProps> = ({ activityLo
           type="button"
           id="btn-export-audit-log"
           onClick={handleExportLogs}
-          className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer self-start sm:self-center"
+          className={`px-4 py-2 rounded-md border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer self-start sm:self-center ${
+            isDark 
+              ? 'bg-black border-white/20 text-white hover:bg-slate-900' 
+              : 'bg-white border-black/20 text-black hover:bg-slate-100'
+          }`}
         >
-          <Download size={14} className="text-purple-400" />
+          <Download size={14} className="text-blue-600" />
           <span>Export Audit Log (JSON)</span>
         </button>
       </div>
 
       {/* Control Bar: Filters & Search */}
-      <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-        {/* Filter Dropdown / Pills */}
+      <div className={`p-4 rounded-md border flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between ${
+        isDark ? 'bg-slate-900/40 border-white/10' : 'bg-slate-50 border-black/10'
+      }`}>
+        {/* Filter Dropdown */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-bold text-slate-400">Filter Event:</span>
+          <span className={`text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Filter Event:</span>
           <select
             aria-label="Filter events by action type"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:ring-1 focus:ring-purple-500 font-medium"
+            className={`px-3 py-2 rounded-md border text-xs font-medium focus:outline-none ${
+              isDark 
+                ? 'bg-black border-white/15 text-white focus:border-blue-600' 
+                : 'bg-white border-black/15 text-black focus:border-blue-600'
+            }`}
           >
             <option value="ALL">All Event Types ({activityLogs.length})</option>
             <option value="ACCOUNT_CREATED">Account Created</option>
@@ -167,7 +176,11 @@ export const AdminActivityView: React.FC<AdminActivityViewProps> = ({ activityLo
             placeholder="Search action, affected user, or administrator..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+            className={`w-full pl-9 pr-3.5 py-2 rounded-md border text-xs placeholder-slate-500 focus:outline-none ${
+              isDark 
+                ? 'bg-black border-white/15 text-white focus:border-blue-600' 
+                : 'bg-white border-black/15 text-black focus:border-blue-600'
+            }`}
           />
           {searchQuery && (
             <button
@@ -182,52 +195,58 @@ export const AdminActivityView: React.FC<AdminActivityViewProps> = ({ activityLo
       </div>
 
       {/* Activity Log List */}
-      <div className="rounded-2xl bg-slate-900/80 border border-slate-800 overflow-hidden">
+      <div className={`rounded-md border overflow-hidden ${
+        isDark ? 'bg-black border-white/10' : 'bg-white border-black/10'
+      }`}>
         {filteredLogs.length === 0 ? (
           <div className="p-12 text-center space-y-2">
-            <Activity size={28} className="mx-auto text-slate-600" />
-            <p className="text-sm font-bold text-white">No activity records found</p>
-            <p className="text-xs text-slate-400">
+            <Activity size={28} className="mx-auto text-slate-500" />
+            <p className={`text-sm font-bold ${isDark ? 'text-white' : 'text-black'}`}>No activity records found</p>
+            <p className="text-xs text-slate-500">
               No audit records match the current filter or search criteria.
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-800/80">
+          <div className={`divide-y ${isDark ? 'divide-white/10' : 'divide-black/10'}`}>
             {filteredLogs.map((log) => (
               <div
                 key={log.id}
-                className="p-4 sm:p-5 hover:bg-slate-900/50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs"
+                className={`p-4 sm:p-5 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs ${
+                  isDark ? 'hover:bg-slate-900/40' : 'hover:bg-slate-50'
+                }`}
               >
                 {/* Event Details */}
                 <div className="space-y-1.5 flex-1">
                   <div className="flex items-center gap-2.5 flex-wrap">
-                    <span className="font-bold text-white text-sm">
+                    <span className={`font-bold text-sm ${isDark ? 'text-white' : 'text-black'}`}>
                       {log.title}
                     </span>
                     {getActionBadge(log.actionType)}
                   </div>
 
-                  <p className="text-slate-300 text-xs leading-relaxed">
+                  <p className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     {log.description}
                   </p>
 
                   {log.affectedUser && (
-                    <div className="flex items-center gap-1.5 text-[11px] text-purple-300 pt-0.5">
-                      <span className="font-semibold text-slate-400">Affected User:</span>
-                      <span className="font-mono">{log.affectedUser}</span>
+                    <div className="flex items-center gap-1.5 text-[11px] pt-0.5">
+                      <span className="font-semibold text-slate-500">Affected User:</span>
+                      <span className="font-mono text-blue-600 font-bold">{log.affectedUser}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Metadata: Administrator & Date/Time */}
-                <div className="flex flex-row md:flex-col md:items-end justify-between text-[11px] text-slate-400 shrink-0 font-mono gap-1 border-t md:border-t-0 pt-2 md:pt-0 border-slate-800/60">
-                  <div className="flex items-center gap-1.5 text-slate-300 font-medium">
-                    <User size={13} className="text-purple-400" />
+                <div className={`flex flex-row md:flex-col md:items-end justify-between text-[11px] shrink-0 font-mono gap-1 border-t md:border-t-0 pt-2 md:pt-0 ${
+                  isDark ? 'border-white/10 text-slate-400' : 'border-black/10 text-slate-600'
+                }`}>
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <User size={13} className="text-blue-600" />
                     <span>{log.adminName}</span>
                     <span className="text-slate-500">({log.adminPersonnelNumber})</span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-slate-400">
+                  <div className="flex items-center gap-1.5 text-slate-500">
                     <Calendar size={12} />
                     <span>{log.timestamp}</span>
                   </div>

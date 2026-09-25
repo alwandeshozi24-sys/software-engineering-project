@@ -232,9 +232,9 @@ export const DetectiveDashboardView: React.FC<DetectiveDashboardViewProps> = ({
                         {c.currentStatus}
                       </span>
                     </div>
-                    <p className={`mt-1 font-semibold ${isDark ? 'text-white' : 'text-black'}`}>{c.offence}</p>
+                    <p className={`mt-1 font-semibold ${isDark ? 'text-white' : 'text-black'}`}>{c.incidentType}</p>
                     <p className={`text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      Complainant: {c.complainantName}
+                      Complainant: {c.complainant?.fullName}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

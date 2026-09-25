@@ -76,6 +76,16 @@ const SEED_CASES: DetectiveCaseDocket[] = [
       nationalId: '920412 5082 089',
       statementSummary: 'Complainant reported unauthorized electronic fund transfers totaling R84,500 following a fraudulent SMS phishing scheme mimicking major clearing banking institution.'
     },
+    registeredByOfficerName: 'Sarah Ndlovu',
+    registeredByOfficerRank: 'Constable',
+    registeredByOfficerPersonnelNumber: 'POL-10824',
+    registeredAt: '2026-08-22T11:30:00Z',
+    registrationStation: 'SAPS Sandton Police Station (CSC Desk)',
+    initialCharge: 'Electronic Banking Phishing & Unauthorized Interception (Sec 86(1) ECT Act 25 of 2002)',
+    previousCustodianName: 'Constable Sarah Ndlovu',
+    previousCustodianRank: 'Constable',
+    previousCustodianPersonnelNumber: 'POL-10824',
+    previousCustodianDepartment: 'Community Service Centre (CSC) Frontline Intake',
     investigatingOfficerId: 'usr_pol_20491',
     investigatingOfficerName: 'David Khumalo',
     investigatingOfficerRank: 'Detective Inspector',
@@ -118,6 +128,16 @@ const SEED_CASES: DetectiveCaseDocket[] = [
       nationalId: '780115 5041 084',
       statementSummary: 'Supplier invoice email hijacked via man-in-the-middle server routing. Payment redirected to an offshore-linked domestic account.'
     },
+    registeredByOfficerName: 'Sarah Ndlovu',
+    registeredByOfficerRank: 'Constable',
+    registeredByOfficerPersonnelNumber: 'POL-10824',
+    registeredAt: '2026-09-12T09:10:00Z',
+    registrationStation: 'SAPS Sandton Police Station (CSC Desk)',
+    initialCharge: 'Corporate Wire Fraud & Interception (Cybercrimes Act 19 of 2020)',
+    previousCustodianName: 'Senior Superintendent Elena Vance',
+    previousCustodianRank: 'Senior Superintendent',
+    previousCustodianPersonnelNumber: 'POL-30912',
+    previousCustodianDepartment: 'Station Commander Oversight & Review Desk',
     investigatingOfficerId: 'usr_pol_20491',
     investigatingOfficerName: 'David Khumalo',
     investigatingOfficerRank: 'Detective Inspector',
@@ -158,6 +178,16 @@ const SEED_CASES: DetectiveCaseDocket[] = [
       nationalId: '861020 0142 081',
       statementSummary: 'Mobile telecommunications SIM swap performed at retail kiosk without FICA verification. OTPs intercepted to drain liquid savings.'
     },
+    registeredByOfficerName: 'Sarah Ndlovu',
+    registeredByOfficerRank: 'Constable',
+    registeredByOfficerPersonnelNumber: 'POL-10824',
+    registeredAt: '2026-09-15T16:45:00Z',
+    registrationStation: 'SAPS Sandton Police Station (CSC Desk)',
+    initialCharge: 'RICA Identity Theft & Cyber Fraud (RICA Act 70 of 2002)',
+    previousCustodianName: 'Constable Sarah Ndlovu',
+    previousCustodianRank: 'Constable',
+    previousCustodianPersonnelNumber: 'POL-10824',
+    previousCustodianDepartment: 'Community Service Centre (CSC) Frontline Intake',
     investigatingOfficerId: 'usr_pol_20491',
     investigatingOfficerName: 'David Khumalo',
     investigatingOfficerRank: 'Detective Inspector',
@@ -319,6 +349,8 @@ const SEED_MOVEMENTS: DocketTransferMovement[] = [
   {
     id: 'det_mov_001',
     caseNumber: 'CAS 342/08/2026',
+    previousCustodian: 'Constable Sarah Ndlovu (POL-10824)',
+    newCustodian: 'Detective Inspector David Khumalo (POL-20491)',
     senderName: 'Sarah Ndlovu',
     senderRank: 'Constable',
     senderPersonnelNumber: 'POL-10824',
@@ -326,6 +358,10 @@ const SEED_MOVEMENTS: DocketTransferMovement[] = [
     destination: 'Commercial Crime Section - Specialist Desk',
     intendedRecipientName: 'David Khumalo',
     intendedRecipientRole: 'Detective Inspector',
+    recipientName: 'David Khumalo',
+    recipientRank: 'Detective Inspector',
+    recipientPersonnelNumber: 'POL-20491',
+    reasonForMovement: 'Physical & digital docket intake transfer following sworn verification of online report SFEN-RPT-000088.',
     movementReason: 'Physical & digital docket intake transfer following sworn verification of online report SFEN-RPT-000088.',
     dispatchedAt: '2026-08-22T11:45:00Z',
     status: 'ACKNOWLEDGED_RECEIVED',
@@ -333,11 +369,14 @@ const SEED_MOVEMENTS: DocketTransferMovement[] = [
     acknowledgedByRank: 'Detective Inspector',
     acknowledgedByPersonnelNumber: 'POL-20491',
     acknowledgedAt: '2026-08-25T09:30:00Z',
-    acknowledgementNotes: 'Physical docket received at Commercial Crime Section safe. Section A and B validated.'
+    acknowledgementNotes: 'Physical docket received at Commercial Crime Section safe. Section A and B validated.',
+    currentDocketCustodian: 'Detective Inspector David Khumalo (POL-20491)'
   },
   {
     id: 'det_mov_002',
     caseNumber: 'CAS 118/09/2026',
+    previousCustodian: 'Senior Superintendent Elena Vance (POL-30912)',
+    newCustodian: 'Detective Inspector David Khumalo (POL-20491)',
     senderName: 'Elena Vance',
     senderRank: 'Senior Superintendent',
     senderPersonnelNumber: 'POL-30912',
@@ -345,9 +384,14 @@ const SEED_MOVEMENTS: DocketTransferMovement[] = [
     destination: 'Commercial Crime Section - Specialist Desk',
     intendedRecipientName: 'David Khumalo',
     intendedRecipientRole: 'Detective Inspector',
+    recipientName: 'David Khumalo',
+    recipientRank: 'Detective Inspector',
+    recipientPersonnelNumber: 'POL-20491',
+    reasonForMovement: 'High priority corporate email compromise docket assigned to Specialist Lead Detective.',
     movementReason: 'High priority corporate email compromise docket assigned to Specialist Lead Detective.',
     dispatchedAt: '2026-09-21T13:45:00Z',
-    status: 'AWAITING_ACKNOWLEDGEMENT'
+    status: 'AWAITING_ACKNOWLEDGEMENT',
+    currentDocketCustodian: 'Senior Superintendent Elena Vance (POL-30912)'
   }
 ];
 
@@ -460,11 +504,15 @@ export const detectiveService = {
   },
 
   /**
-   * Retrieves a specific case docket, checking assignment authorization.
+   * Retrieves a specific case docket, checking assignment authorization if detectivePersonnelNumber provided.
    */
-  getCaseByNumber(caseNumber: string, detectivePersonnelNumber: string): DetectiveCaseDocket | null {
-    const assigned = this.getAssignedCases(detectivePersonnelNumber);
-    return assigned.find(c => c.caseNumber.trim().toUpperCase() === caseNumber.trim().toUpperCase()) || null;
+  getCaseByNumber(caseNumber: string, detectivePersonnelNumber?: string): DetectiveCaseDocket | null {
+    if (detectivePersonnelNumber) {
+      const assigned = this.getAssignedCases(detectivePersonnelNumber);
+      return assigned.find(c => c.caseNumber.trim().toUpperCase() === caseNumber.trim().toUpperCase()) || null;
+    }
+    const all = this.getAllCases();
+    return all.find(c => c.caseNumber.trim().toUpperCase() === caseNumber.trim().toUpperCase()) || null;
   },
 
   /**
@@ -514,6 +562,7 @@ export const detectiveService = {
     const prevCustodian = targetCase.currentCustodianName;
     const nowIso = new Date().toISOString();
 
+    targetCase.previousCustodianName = prevCustodian;
     targetCase.currentCustodianName = `${detective.rank} ${detective.fullName}`;
     targetCase.currentCustodianRank = detective.rank;
     targetCase.currentCustodianPersonnelNumber = detective.personnelNumber;
@@ -537,6 +586,7 @@ export const detectiveService = {
           acknowledgedByRank: detective.rank,
           acknowledgedByPersonnelNumber: detective.personnelNumber,
           acknowledgedAt: nowIso,
+          currentDocketCustodian: `${detective.rank} ${detective.fullName} (${detective.personnelNumber})`,
           acknowledgementNotes: notes || 'Physical and digital docket acknowledged and accepted into detective custody.'
         };
       }
@@ -784,6 +834,7 @@ export const detectiveService = {
       caseNumber: string;
       destination: string;
       intendedRecipientName?: string;
+      intendedRecipientPersonnelNumber?: string;
       intendedRecipientRole?: string;
       movementReason: string;
     },
@@ -792,9 +843,14 @@ export const detectiveService = {
     const all = safeStorageGet<DocketTransferMovement[]>(DETECTIVE_STORAGE_KEYS.MOVEMENTS, SEED_MOVEMENTS);
     const nowIso = new Date().toISOString();
 
+    const targetRecipient = params.intendedRecipientName?.trim() || params.destination;
+    const prevCust = `${detective.rank} ${detective.fullName} (${detective.personnelNumber})`;
+
     const newMovement: DocketTransferMovement = {
       id: `det_mov_${Date.now()}`,
       caseNumber: params.caseNumber,
+      previousCustodian: prevCust,
+      newCustodian: targetRecipient,
       senderName: detective.fullName,
       senderRank: detective.rank,
       senderPersonnelNumber: detective.personnelNumber,
@@ -802,9 +858,12 @@ export const detectiveService = {
       destination: params.destination,
       intendedRecipientName: params.intendedRecipientName?.trim() || undefined,
       intendedRecipientRole: params.intendedRecipientRole?.trim() || undefined,
+      recipientName: targetRecipient,
+      reasonForMovement: params.movementReason.trim(),
       movementReason: params.movementReason.trim(),
       dispatchedAt: nowIso,
-      status: 'AWAITING_ACKNOWLEDGEMENT'
+      status: 'AWAITING_ACKNOWLEDGEMENT',
+      currentDocketCustodian: prevCust
     };
 
     safeStorageSet(DETECTIVE_STORAGE_KEYS.MOVEMENTS, [newMovement, ...all]);
@@ -813,9 +872,17 @@ export const detectiveService = {
     const cases = safeStorageGet<DetectiveCaseDocket[]>(DETECTIVE_STORAGE_KEYS.CASES, SEED_CASES);
     const cIdx = cases.findIndex(c => c.caseNumber === params.caseNumber);
     if (cIdx !== -1) {
+      cases[cIdx].previousCustodianName = `${detective.rank} ${detective.fullName}`;
+      cases[cIdx].previousCustodianRank = detective.rank;
+      cases[cIdx].previousCustodianPersonnelNumber = detective.personnelNumber;
+      cases[cIdx].previousCustodianDepartment = detective.division || 'Commercial Crime Section';
       cases[cIdx].custodyStatus = 'TRANSFERRED_AWAITING_RECEIPT';
+      cases[cIdx].isCustodyAcknowledgedByDetective = false;
       cases[cIdx].currentCustodianName = `${params.destination} (Awaiting Custody Acceptance)`;
       cases[cIdx].currentCustodianDepartment = params.destination;
+      if (params.intendedRecipientPersonnelNumber) {
+        cases[cIdx].currentCustodianPersonnelNumber = params.intendedRecipientPersonnelNumber;
+      }
       cases[cIdx].lastActivityDate = nowIso.split('T')[0];
       safeStorageSet(DETECTIVE_STORAGE_KEYS.CASES, cases);
     }
@@ -830,13 +897,62 @@ export const detectiveService = {
       userRank: detective.rank,
       userPersonnelNumber: detective.personnelNumber,
       userRole: 'DETECTIVE',
-      description: `Initiated docket dispatch to [${params.destination}]. Reason: "${params.movementReason}". Status: Awaiting Receipt.`,
+      description: `Initiated docket dispatch to [${params.destination}]. Recipient: ${targetRecipient}. Reason: "${params.movementReason}". Status: Awaiting Receipt.`,
       timestamp: nowIso,
       securityHash: generateSecurityHash(params.caseNumber, 'DOCKET_MOVEMENT_INITIATED', nowIso)
     };
     safeStorageSet(DETECTIVE_STORAGE_KEYS.AUDIT, [auditRecord, ...audits]);
 
+    // If destination is Station Commander, notify Commander
+    if (params.destination.toLowerCase().includes('commander') || params.intendedRecipientRole?.toLowerCase().includes('commander')) {
+      try {
+        const cmdNotifs = safeStorageGet<any[]>('sfen_commander_notifications', []);
+        const newCmdNotif = {
+          id: `notif_cmd_${Date.now()}`,
+          type: 'CASE_REQUIRES_REVIEW',
+          title: `Docket Transferred for Supervisory Review: ${params.caseNumber}`,
+          message: `Detective Inspector ${detective.fullName} has submitted docket ${params.caseNumber} for formal supervisory review. Reason: ${params.movementReason}`,
+          caseNumber: params.caseNumber,
+          timestamp: nowIso,
+          read: false,
+          priority: 'urgent'
+        };
+        safeStorageSet('sfen_commander_notifications', [newCmdNotif, ...cmdNotifs]);
+      } catch {
+        // fallback
+      }
+    }
+
     return newMovement;
+  },
+
+  /**
+   * Directly transfers docket to Station Commander for Supervisory Review & Inspection.
+   */
+  transferDocketToCommander(
+    params: {
+      caseNumber: string;
+      movementReason: string;
+    },
+    detective: UserProfile,
+    commanderName: string = 'Senior Superintendent Elena Vance',
+    commanderPersonnel: string = 'POL-30912',
+    commanderRank: string = 'Senior Superintendent'
+  ): { success: boolean; message: string; movement?: DocketTransferMovement } {
+    const movement = this.initiateDocketTransfer({
+      caseNumber: params.caseNumber,
+      destination: 'Station Commander Oversight & Supervisory Review Desk',
+      intendedRecipientName: `${commanderRank} ${commanderName}`,
+      intendedRecipientPersonnelNumber: commanderPersonnel,
+      intendedRecipientRole: 'Station Commander',
+      movementReason: params.movementReason
+    }, detective);
+
+    return {
+      success: true,
+      message: `Docket ${params.caseNumber} formally transferred to Station Commander ${commanderName} for supervisory inspection.`,
+      movement
+    };
   },
 
   /**
